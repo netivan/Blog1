@@ -1,0 +1,63 @@
+﻿@page
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+    var user = await UserManager.GetUserAsync(User);
+}
+
+<div class="text-left">
+    <h1 class="display-4">Bloggen</h1>
+
+
+
+    <div class="container">
+        <div class="row">
+            @foreach (var blog in Model.Blogs)
+            {
+                <div class="col-md-3 border p-2 m-3">
+                    <img src="~/img/@blog.Image" width="200" />
+                    <h3>@blog.Header</h3>
+                    <p>@Html.Raw(blog.Text.Replace("\r\n", "<br>"))</p>
+                    <small>Publicerad: @blog.Date</small>
+                    @if (user != null && user.Id == blog.UserId)
+                    {
+                        <p>
+                            Ditt inlägg (
+                            <a href="?blogdeleteid=@blog.ID">Ta bort</a> )
+                        </p>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <p>Du är inloggad som @User.Identity.Name</p>
+        <form method="post" enctype="multipart/form-data">
+            <p>Rubrik</p>
+            <input type="text" id="header" name="header" />
+
+            <p>Text</p>
+            <textarea name="text" cols="40" rows="5"></textarea><br />
+            <p>Bild</p>
+            <input type="file" name="UploadedImage" />
+
+            <input type="submit" value="Spara" />
+
+
+        </form>
+    }
+    else
+    {
+        <p>Du är inte inloggad!</p>
+    }
+
+
+
+
+</div>
